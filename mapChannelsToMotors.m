@@ -18,7 +18,7 @@ function [delta_1, delta_2, delta_3, delta_4] = mapChannelsToMotors(delta_e,delt
     %       X
     %     2   4
     
-    delta_1 = 0; % front right
-    delta_2 = 0; % back left
-    delta_3 = 0; % front left 
-    delta_4 = 0; % back right
+    delta_1 = delta_e-delta_a+delta_r+delta_t; % front right
+    delta_2 = -delta_e+delta_a+delta_r+delta_t; % back left
+    delta_3 = delta_e+delta_a-delta_r+delta_t; % front left 
+    delta_4 = -delta_e-delta_a-delta_r+delta_t; % back right
