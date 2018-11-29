@@ -46,11 +46,17 @@ function out = quadsim_kin_dyn(uu,P)
     m_b   = f_and_m(4:6); % External moments about body x,y,z, N-m
 
     % Your code goes below...
-        
-    Pdot_ned = zeros(3,1);
-    vgdot_b = zeros(3,1);
-    euler_rates = zeros(3,1);    
-    wdot_b = zeros(3,1);
+    R_ned2b = eulerToRotationMatrix(phi,theta,psi);
+    Pdot_ned = transpose(R_ned2b)*vg_b;
+    vgdot_b = cross(-w_b, vg_b)+((1/P.mass)*f_b);
+    body_to_euler = [1  sin(phi)*tan(theta) cos(phi)*tan(theta); 
+                     0      cos(phi)            -sin(phi); 
+                     0  sin(phi)*sec(theta) cos(phi)*sec(theta)];
+    euler_rates = body_to_euler*w_b;
+    J = [P.Jx       0        -P.Jxz; 
+            0      P.Jy         0; 
+        -P.Jxz      0         P.Jz];
+    wdot_b = J\(cross(-w_b,J*w_b)+m_b);
 
     % Compile state derivatives vector
     xdot = [Pdot_ned; vgdot_b; euler_rates; wdot_b];
