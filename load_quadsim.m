@@ -13,4 +13,5 @@ open('quadsim')
 P = init_quadsim_params;
 
 % Compute the trim condition and set trim parameters in P
-P.delta_t0 = 0;
+P.delta_t0 = sqrt(P.mass*P.gravity ...
+    / (4*(P.rho*P.C_prop*P.S_prop*P.k_motor^2)));

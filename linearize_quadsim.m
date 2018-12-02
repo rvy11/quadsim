@@ -89,12 +89,12 @@ function xdot = eval_forces_moments_kin_dyn(x,deltas,P)
     %   INPUT: uu = [wind_ned(1:3); deltas(1:4); x(1:12); time(1)];
     %   OUTPUT: out = [Forces; Torques]; % Length 3+3=6
     uu = [wind_ned; deltas; x; time]; % Note: uu should be a column vector
-    f_and_m = uavsim_forces_moments(uu, P);
+    f_and_m = quadsim_forces_moments(uu, P);
 
     % xdot = uav_kin_dyn(uu,P)
     %   INPUT: uu = [x(1:12); f_and_m(1:6); time(1)];
     %   OUTPUT: xdot = [Pdot_ned; vgdot_b; euler_rates; wdot_b];
     uu = [x; f_and_m; time]; % Note: uu should be a column vector
-    xdot = uavsim_kin_dyn(uu, P);
+    xdot = quadsim_kin_dyn(uu, P);
 
 end
