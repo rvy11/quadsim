@@ -99,3 +99,91 @@ function out = quadsim_control(uu,P)
     out=[delta;ap_command]; % 4+9=13
 
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% roll_hold
+%   - regulate roll using aileron
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function u = PIR_roll_hold(phi_c, phi_hat, p_hat, init_flag, P)
+
+    % Set up PI with rate feedback
+    y_c = phi_c; % Command
+    y = phi_hat; % Feedback
+    y_dot = p_hat; % Rate feedback
+    kp = P.roll_kp;
+    ki = P.roll_ki;
+    kd = P.roll_kd;
+    u_lower_limit = -P.delta_a_max;
+    u_upper_limit = +P.delta_a_max;
+
+    % Initialize integrator (e.g. when t==0)
+    persistent error_int;
+    if( init_flag )   
+        error_int = 0;
+    end  
+
+    % Perform "PI with rate feedback"
+    error = y_c - y;  % Error between command and response
+    error_int = error_int + P.Ts*error; % Update integrator
+    u = kp*error + ki*error_int - kd*y_dot;
+
+    % Output saturation & integrator clamping
+    %   - Limit u to u_upper_limit & u_lower_limit
+    %   - Clamp if error is driving u past limit
+    if u > u_upper_limit
+        u = u_upper_limit;
+        if ki*error>0
+            error_int = error_int - P.Ts*error;
+        end
+    elseif u < u_lower_limit
+        u = u_lower_limit;
+        if ki*error<0
+            error_int = error_int - P.Ts*error;
+        end
+    end
+    
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% pitch_hold
+%   - regulate pitch using elevator
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function u = PIR_pitch_hold(theta_c, theta_hat, q_hat, init_flag, P)
+
+    % Set up PI with rate feedback
+    y_c = theta_c; % Command
+    y = theta_hat; % Feedback
+    y_dot = q_hat; % Rate feedback
+    kp = P.pitch_kp;
+    ki = P.pitch_ki;
+    kd = P.pitch_kd;
+    u_lower_limit = -P.delta_e_max;
+    u_upper_limit = +P.delta_e_max;
+
+    % Initialize integrator (e.g. when t==0)
+    persistent error_int;
+    if( init_flag )   
+        error_int = 0;
+    end  
+
+    % Perform "PI with rate feedback"
+    error = y_c - y;  % Error between command and response
+    error_int = error_int + P.Ts*error; % Update integrator
+    u = kp*error + ki*error_int - kd*y_dot;
+
+    % Output saturation & integrator clamping
+    %   - Limit u to u_upper_limit & u_lower_limit
+    %   - Clamp if error is driving u past limit
+    if u > u_upper_limit
+        u = u_upper_limit;
+        if ki*error>0
+            error_int = error_int - P.Ts*error;
+        end
+    elseif u < u_lower_limit
+        u = u_lower_limit;
+        if ki*error<0
+            error_int = error_int - P.Ts*error;
+        end
+    end
+    
+end

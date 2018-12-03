@@ -27,16 +27,24 @@ H(ktheta,kde);
 H(kphi,kda);
 H(kpsi,kdr);
 
-subplot(1, 2, 1);
-step(G_de2pitch);
-title('Linear Step Response of G_de2pitch', 'FontSize', 16);
-xlabel('Time (seconds)', 'FontSize', 14);
-ylabel('Angle Rate (degrees/second)', 'FontSize', 14);
-subplot(1, 2, 2);
-step(H(ktheta,kde));
-title('Linear Step Response of H(ktheta,kde)', 'FontSize', 16);
-xlabel('Time (seconds)', 'FontSize', 14);
-ylabel('Angle Rate (degrees/second)', 'FontSize', 14);
+% subplot(1, 2, 1);
+% step(G_de2pitch);
+% title('Linear Step Response of G_de2pitch', 'FontSize', 16);
+% xlabel('Time (seconds)', 'FontSize', 14);
+% ylabel('Angle Rate (degrees/second)', 'FontSize', 14);
+% subplot(1, 2, 2);
+% step(H(ktheta,kde));
+% title('Linear Step Response of H(ktheta,kde)', 'FontSize', 16);
+% xlabel('Time (seconds)', 'FontSize', 14);
+% ylabel('Angle Rate (degrees/second)', 'FontSize', 14);
 
-
-
+Gcl_pitch_low =PI_rateFeedback_TF(G_de2pitch, 5, 0.05, 5); 
+Gcl_pitch_high=PI_rateFeedback_TF(H(ktheta,kde), 5, 0.05, 5); 
+step(Gcl_pitch_low, Gcl_pitch_high, 10) % 2 seconds
+grid on;
+lgd = legend('G_de2pitch', 'H(ktheta,kde)');
+lgd.FontSize = 12;
+set(lgd,'string',{'G_de2pitch','H(ktheta,kde)'});
+title('Step Response', 'FontSize', 14);
+xlabel('Time', 'FontSize', 14);
+ylabel('Amplitude', 'FontSize', 14);
