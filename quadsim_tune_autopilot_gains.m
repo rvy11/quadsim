@@ -62,16 +62,16 @@ H(kpsi,kdr);
 % xlabel('Time', 'FontSize', 14);
 % ylabel('Amplitude', 'FontSize', 14);
 
-Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 20, 0.1, 30); 
-Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 20, 0.1, 30); 
-step(Gcl_alt_low, Gcl_alt_high, 10) % 2 seconds
-grid on;
-lgd = legend('G_dt2h', '-H(kpd,kdt))');
-lgd.FontSize = 12;
-set(lgd,'string',{'G_dt2h','-H(kpd,kdt)'});
-title('Step Response', 'FontSize', 14);
-xlabel('Time', 'FontSize', 14);
-ylabel('Amplitude', 'FontSize', 14);
+% Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 20, 0.1, 30); 
+% Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 20, 0.1, 30); 
+% step(Gcl_alt_low, Gcl_alt_high, 10) % 2 seconds
+% grid on;
+% lgd = legend('G_dt2h', '-H(kpd,kdt))');
+% lgd.FontSize = 12;
+% set(lgd,'string',{'G_dt2h','-H(kpd,kdt)'});
+% title('Step Response', 'FontSize', 14);
+% xlabel('Time', 'FontSize', 14);
+% ylabel('Amplitude', 'FontSize', 14);
 
 % Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 5, 0.05, 5); 
 % Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 5, 0.05, 5); 
@@ -84,16 +84,16 @@ ylabel('Amplitude', 'FontSize', 14);
 % xlabel('Time', 'FontSize', 14);
 % ylabel('Amplitude', 'FontSize', 14);
 
-% Gcl_pitch2Vhx =PI_rateFeedback_TF(G_pitch2Vhx, -1, -0.5, -0.1);
-% Gcl_roll2Vhx =PI_rateFeedback_TF(G_roll2Vhx, 1, 0.5, 0.1);
-% % step(Gcl_pitch2Vhx, G_roll2Vhx, 10) % 2 seconds
-% step(Gcl_pitch2Vhx, 10); % 2 seconds
-% grid on;
-% % lgd = legend('Gcl_pitch2Vhx', 'G_roll2Vhx');
-% lgd = legend('Gcl_pitch2Vhx');
-% lgd.FontSize = 12;
-% % set(lgd,'string',{'Gcl_pitch2Vhx','G_roll2Vhx'});
-% set(lgd,'string',{'Gcl_pitch2Vhx'});
-% title('Step Response', 'FontSize', 14);
-% xlabel('Time', 'FontSize', 14);
-% ylabel('Amplitude', 'FontSize', 14);
+Gcl_pitch2Vhx =PI_rateFeedback_TF(G_pitch2Vhx, -1, -0.5, -0.1);
+Gcl_roll2Vhx =PI_rateFeedback_TF(G_roll2Vhx, 1, 0.5, 0.1);
+% step(Gcl_pitch2Vhx, G_roll2Vhx, 10) % 2 seconds
+step(Gcl_pitch2Vhx, 10); % 2 seconds
+grid on;
+% lgd = legend('Gcl_pitch2Vhx', 'G_roll2Vhx');
+lgd = legend('Gcl_pitch2Vhx');
+lgd.FontSize = 12;
+% set(lgd,'string',{'Gcl_pitch2Vhx','G_roll2Vhx'});
+set(lgd,'string',{'Gcl_pitch2Vhx'});
+title('Step Response', 'FontSize', 14);
+xlabel('Time', 'FontSize', 14);
+ylabel('Amplitude', 'FontSize', 14);

@@ -69,22 +69,22 @@ function out = quadsim_control(uu,P)
     %         Vhorz_c,  chi_c, h_c, phi_c, theta_c, psi_c
 
     % Getting trajectory commands
-    % [WP_n, WP_e, h_c, psi_c] = get_quadsim_trajectory_commands(time);
-    % chi_c = atan2(WP_e-pe_hat, WP_n - pn_hat);
-    % k_pos = 0.5;
-    % Vhorz_c = k_pos*sqrt((WP_e-pe_hat)^2 + (WP_n - pn_hat)^2);
-    % if (Vhorz_c > 8)
-    %     Vhorz_c = 8;
-    % end
+    [WP_n, WP_e, h_c, psi_c] = get_quadsim_trajectory_commands(time);
+    chi_c = atan2(WP_e-pe_hat, WP_n - pn_hat);
+    k_pos = 0.1;
+    Vhorz_c = k_pos*sqrt((WP_e-pe_hat)^2 + (WP_n - pn_hat)^2);
+    if (Vhorz_c > 8)
+        Vhorz_c = 8;
+    end
 
-    % Vn_cmd = Vhorz_c*sin(chi_c);
-    % Ve_cmd = Vhorz_c*cos(chi_c);
+    Vn_cmd = Vhorz_c*cos(chi_c);
+    Ve_cmd = Vhorz_c*sin(chi_c);
 
-    % Vh_c = [cos(psi_hat) sin(psi_hat); -sin(psi_hat) cos(psi_hat)]*[Vn_cmd; Ve_cmd];
-    % Vhx_c = Vh_c(1); Vhy_c = Vh_c(2);
+    Vh_c = [cos(psi_hat) sin(psi_hat); -sin(psi_hat) cos(psi_hat)]*[Vn_cmd; Ve_cmd];
+    Vhx_c = Vh_c(1); Vhy_c = Vh_c(2);
     
-    % Vh_hat = [cos(psi_hat) sin(psi_hat); -sin(psi_hat) cos(psi_hat)]*[Vn_hat; Ve_hat];
-    % Vhx_hat = Vh_hat(1); Vhy_hat = Vh_hat(2);
+    Vh_hat = [cos(psi_hat) sin(psi_hat); -sin(psi_hat) cos(psi_hat)]*[Vn_hat; Ve_hat];
+    Vhx_hat = Vh_hat(1); Vhy_hat = Vh_hat(2);
      
     if(firstTime)
         % Initialize integrators
@@ -125,16 +125,16 @@ function out = quadsim_control(uu,P)
 %         psi_c = 0;
 %     end
 
-    % theta_c = PIR_vhorz_hold_x(Vhx_c, Vhx_hat, 0, firstTime, P);
-    % phi_c = PIR_vhorz_hold_y(Vhy_c, Vhy_hat, 0, firstTime, P); 
-    h_c = 50;
+    theta_c = PIR_vhorz_hold_x(Vhx_c, Vhx_hat, 0, firstTime, P);
+    phi_c = PIR_vhorz_hold_y(Vhy_c, Vhy_hat, 0, firstTime, P); 
+
     delta_t = PIR_alt_hold(h_c, h_hat, 0, firstTime, P);
 
-    % delta_a = PIR_roll_hold(phi_c, phi_hat, p_hat, firstTime, P);
+    delta_a = PIR_roll_hold(phi_c, phi_hat, p_hat, firstTime, P);
 
-    % delta_e = PIR_pitch_hold(theta_c, theta_hat, q_hat, firstTime, P);
+    delta_e = PIR_pitch_hold(theta_c, theta_hat, q_hat, firstTime, P);
 
-    % delta_r = PIR_yaw_hold(psi_c, psi_hat, r_hat, firstTime, P);
+    delta_r = PIR_yaw_hold(psi_c, psi_hat, r_hat, firstTime, P);
     
     % Compile vector of control surface deflections
     delta = [ ...
