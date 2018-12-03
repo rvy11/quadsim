@@ -68,6 +68,49 @@ function out = quadsim_control(uu,P)
     % Note: For logging purposes, use variables: 
     %         Vhorz_c,  chi_c, h_c, phi_c, theta_c, psi_c
 
+    if(firstTime)
+        % Initialize integrators 
+%         PIR_pitch_hold(0,0,0,firstTime,P); 
+        PIR_alt_hold(0,0,0,firstTime,P); 
+%         PIR_airspeed_hold_using_throttle(0,0,0,firstTime,P); 
+%         PIR_airspeed_hold_using_pitch(0,0,0,firstTime,P);
+    end
+    
+    if time<10
+        % h_c=50;
+        % phi_c = 0;
+        % theta_c = 0;
+        psi_c = 0;
+    elseif time<20
+        % h_c=25;
+        % phi_c = 45*pi/180;
+        theta_c = 45*pi/180;
+        psi_c = 45*pi/180;
+    elseif time<30
+        % h_c=50;
+        % phi_c = -45*pi/180;
+        % theta_c = -45*pi/180;
+        psi_c = -45*pi/180;
+    elseif time<40
+        % h_c=75;
+        % phi_c = 45*pi/180;
+        % theta_c = 45*pi/180;
+        psi_c = 45*pi/180;
+    else
+        % h_c=50;
+        % phi_c = 0;
+        % theta_c = 0;
+        psi_c = 0;
+    end
+    
+    h_c=50;
+    delta_t = PIR_alt_hold(h_c, h_hat, 0, firstTime, P); 
+
+    % delta_a = PIR_roll_hold(phi_c, phi_hat, p_hat, firstTime, P);
+
+    % delta_e = PIR_pitch_hold(theta_c, theta_hat, q_hat, firstTime, P);
+
+    delta_r = PIR_yaw_hold(psi_c, psi_hat, r_hat, firstTime, P);
     
     % Compile vector of control surface deflections
     delta = [ ...
@@ -110,11 +153,55 @@ function u = PIR_roll_hold(phi_c, phi_hat, p_hat, init_flag, P)
     y_c = phi_c; % Command
     y = phi_hat; % Feedback
     y_dot = p_hat; % Rate feedback
-    kp = P.roll_kp;
-    ki = P.roll_ki;
-    kd = P.roll_kd;
-    u_lower_limit = -P.delta_a_max;
-    u_upper_limit = +P.delta_a_max;
+    kp = 5;
+    ki = 0.05;
+    kd = 5;
+    u_lower_limit = -0.1;
+    u_upper_limit = +0.1;
+
+    % Initialize integrator (e.g. when t==0)
+    persistent error_int;
+    if( init_flag )   
+        error_int = 0;
+    end  
+
+    % Perform "PI with rate feedback"
+    error = y_c - y;  % Error between command and response
+    error_int = error_int + P.Ts*error; % Update integrator
+    u = kp*error + ki*error_int - kd*y_dot;
+
+    % Output saturation & integrator clamping
+    %   - Limit u to u_upper_limit & u_lower_limit
+    %   - Clamp if error is driving u past limit
+    if u > u_upper_limit
+        u = u_upper_limit;
+        if ki*error>0
+            error_int = error_int - P.Ts*error;
+        end
+    elseif u < u_lower_limit
+        u = u_lower_limit;
+        if ki*error<0
+            error_int = error_int - P.Ts*error;
+        end
+    end
+    
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% alt_hold
+%   - regulate altitude using throttle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function u = PIR_alt_hold(h_c, h_hat, not_used, init_flag, P)
+
+    % Set up PI with rate feedback
+    y_c = h_c; % Command
+    y = h_hat; % Feedback
+    y_dot = 0; % Rate feedback
+    kp = 5;
+    ki = 0.05;
+    kd = 5;
+    u_lower_limit = 0.1;
+    u_upper_limit = 0.9;
 
     % Initialize integrator (e.g. when t==0)
     persistent error_int;
@@ -154,11 +241,11 @@ function u = PIR_pitch_hold(theta_c, theta_hat, q_hat, init_flag, P)
     y_c = theta_c; % Command
     y = theta_hat; % Feedback
     y_dot = q_hat; % Rate feedback
-    kp = P.pitch_kp;
-    ki = P.pitch_ki;
-    kd = P.pitch_kd;
-    u_lower_limit = -P.delta_e_max;
-    u_upper_limit = +P.delta_e_max;
+    kp = 5;
+    ki = 0.05;
+    kd = 5;
+    u_lower_limit = -0.1;
+    u_upper_limit = 0.1;
 
     % Initialize integrator (e.g. when t==0)
     persistent error_int;
@@ -168,6 +255,51 @@ function u = PIR_pitch_hold(theta_c, theta_hat, q_hat, init_flag, P)
 
     % Perform "PI with rate feedback"
     error = y_c - y;  % Error between command and response
+    error_int = error_int + P.Ts*error; % Update integrator
+    u = kp*error + ki*error_int - kd*y_dot;
+
+    % Output saturation & integrator clamping
+    %   - Limit u to u_upper_limit & u_lower_limit
+    %   - Clamp if error is driving u past limit
+    if u > u_upper_limit
+        u = u_upper_limit;
+        if ki*error>0
+            error_int = error_int - P.Ts*error;
+        end
+    elseif u < u_lower_limit
+        u = u_lower_limit;
+        if ki*error<0
+            error_int = error_int - P.Ts*error;
+        end
+    end
+    
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% yaw_hold
+%   - regulate yaw using rudder
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function u = PIR_yaw_hold(psi_c, psi_hat, r_hat, init_flag, P)
+
+    % Set up PI with rate feedback
+    y_c = psi_c; % Command
+    y = psi_hat; % Feedback
+    y_dot = r_hat; % Rate feedback
+    kp = 5;
+    ki = 0.05;
+    kd = 5;
+    u_lower_limit = -0.1;
+    u_upper_limit = 0.1;
+
+    % Initialize integrator (e.g. when t==0)
+    persistent error_int;
+    if( init_flag )   
+        error_int = 0;
+    end  
+
+    % Perform "PI with rate feedback"
+    % error = y_c - y;  % Error between command and response
+    error = mod(y_c - y + pi, 2*pi)-pi;
     error_int = error_int + P.Ts*error; % Update integrator
     u = kp*error + ki*error_int - kd*y_dot;
 

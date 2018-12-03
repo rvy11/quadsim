@@ -38,13 +38,46 @@ H(kpsi,kdr);
 % xlabel('Time (seconds)', 'FontSize', 14);
 % ylabel('Angle Rate (degrees/second)', 'FontSize', 14);
 
-Gcl_pitch_low =PI_rateFeedback_TF(G_de2pitch, 5, 0.05, 5); 
-Gcl_pitch_high=PI_rateFeedback_TF(H(ktheta,kde), 5, 0.05, 5); 
-step(Gcl_pitch_low, Gcl_pitch_high, 10) % 2 seconds
+% Gcl_pitch_low =PI_rateFeedback_TF(G_de2pitch, 5, 0.05, 5); 
+% Gcl_pitch_high=PI_rateFeedback_TF(H(ktheta,kde), 5, 0.05, 5); 
+% step(Gcl_pitch_low, Gcl_pitch_high, 10) % 2 seconds
+% grid on;
+% lgd = legend('G_de2pitch', 'H(ktheta,kde)');
+% lgd.FontSize = 12;
+% set(lgd,'string',{'G_de2pitch','H(ktheta,kde)'});
+% title('Step Response', 'FontSize', 14);
+% xlabel('Time', 'FontSize', 14);
+% ylabel('Amplitude', 'FontSize', 14);
+
+% Gcl_roll_low =PI_rateFeedback_TF(G_da2roll, 5, 0.05, 5); 
+% Gcl_roll_high=PI_rateFeedback_TF(H(kphi,kda), 5, 0.05, 5); 
+% step(Gcl_roll_low, Gcl_roll_high, 10) % 2 seconds
+% grid on;
+% lgd = legend('G_da2roll', 'H(kphi,kda)');
+% lgd.FontSize = 12;
+% set(lgd,'string',{'G_da2roll','H(kphi,kda)'});
+% title('Step Response', 'FontSize', 14);
+% xlabel('Time', 'FontSize', 14);
+% ylabel('Amplitude', 'FontSize', 14);
+
+% Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 5, 0.05, 5); 
+% Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 5, 0.05, 5); 
+% step(Gcl_alt_low, Gcl_alt_high, 10) % 2 seconds
+% grid on;
+% lgd = legend('G_dt2h', '-H(kpd,kdt))');
+% lgd.FontSize = 12;
+% set(lgd,'string',{'G_dt2h','-H(kpd,kdt)'});
+% title('Step Response', 'FontSize', 14);
+% xlabel('Time', 'FontSize', 14);
+% ylabel('Amplitude', 'FontSize', 14);
+
+Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 5, 0.05, 5); 
+Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 5, 0.05, 5); 
+step(Gcl_alt_low, Gcl_alt_high, 10) % 2 seconds
 grid on;
-lgd = legend('G_de2pitch', 'H(ktheta,kde)');
+lgd = legend('G_dt2h', '-H(kpd,kdt))');
 lgd.FontSize = 12;
-set(lgd,'string',{'G_de2pitch','H(ktheta,kde)'});
+set(lgd,'string',{'G_dt2h','-H(kpd,kdt)'});
 title('Step Response', 'FontSize', 14);
 xlabel('Time', 'FontSize', 14);
 ylabel('Amplitude', 'FontSize', 14);
