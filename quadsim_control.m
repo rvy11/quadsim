@@ -222,12 +222,12 @@ end
 % alt_hold
 %   - regulate altitude using throttle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function u = PIR_alt_hold(h_c, h_hat, Vn_hat, init_flag, P)
+function u = PIR_alt_hold(h_c, h_hat, hdot_hat, init_flag, P)
 
     % Set up PI with rate feedback
     y_c = h_c; % Command
     y = h_hat; % Feedback
-    y_dot = Vn_hat; % Rate feedback
+    y_dot = hdot_hat; % Rate feedback
     kp = 0.05;
     ki = 0.0001;
     kd = 0.075;
