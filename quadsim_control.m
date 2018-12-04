@@ -56,6 +56,10 @@ function out = quadsim_control(uu,P)
     % Initialize autopilot commands (may be overwritten with PID logic)
     phi_c = 0;
     theta_c = 0;
+    
+    R_ned2b = eulerToRotationMatrix(phi_hat,theta_hat,psi_hat);
+    vgb_hat = R_ned2b*[Vn_hat; Ve_hat; Vd_hat];
+    hdot_hat = -vgb_hat(3);
 
     % Set "first-time" flag, which is used to initialize PID integrators
     firstTime=(time==0);
@@ -101,34 +105,34 @@ function out = quadsim_control(uu,P)
 %     if time<10
 %         % h_c=50;
 %         % phi_c = 0;
-%         % theta_c = 0;
-%         psi_c = 0;
+% %         theta_c = 0;
+% %         psi_c = 0;
 %     elseif time<20
 %         % h_c=25;
-%         % phi_c = 45*pi/180;
-%         theta_c = 45*pi/180;
+% %         phi_c = 45*pi/180;
+% %         theta_c = 45*pi/180;
 %         psi_c = 45*pi/180;
 %     elseif time<30
 %         % h_c=50;
-%         % phi_c = -45*pi/180;
-%         % theta_c = -45*pi/180;
-%         psi_c = -45*pi/180;
+% %         phi_c = -45*pi/180;
+% %         theta_c = -45*pi/180;
+% %         psi_c = -45*pi/180;
 %     elseif time<40
 %         % h_c=75;
-%         % phi_c = 45*pi/180;
-%         % theta_c = 45*pi/180;
-%         psi_c = 45*pi/180;
+% %         phi_c = 45*pi/180;
+% %         theta_c = 45*pi/180;
+% %         psi_c = 45*pi/180;
 %     else
 %         % h_c=50;
-%         % phi_c = 0;
-%         % theta_c = 0;
-%         psi_c = 0;
+% %         phi_c = 0;
+% %         theta_c = 0;
+% %         psi_c = 0;
 %     end
 
     theta_c = PIR_vhorz_hold_x(Vhx_c, Vhx_hat, 0, firstTime, P);
     phi_c = PIR_vhorz_hold_y(Vhy_c, Vhy_hat, 0, firstTime, P); 
-
-    delta_t = PIR_alt_hold(h_c, h_hat, 0, firstTime, P);
+    
+    delta_t = PIR_alt_hold(h_c, h_hat, hdot_hat, firstTime, P);
 
     delta_a = PIR_roll_hold(phi_c, phi_hat, p_hat, firstTime, P);
 
@@ -177,9 +181,9 @@ function u = PIR_roll_hold(phi_c, phi_hat, p_hat, init_flag, P)
     y_c = phi_c; % Command
     y = phi_hat; % Feedback
     y_dot = p_hat; % Rate feedback
-    kp = 5;
-    ki = 0.05;
-    kd = 5;
+    kp = 0.1146;
+    ki = 0.0075;
+    kd = 0.025;
     u_lower_limit = -0.1;
     u_upper_limit = +0.1;
 
@@ -215,15 +219,15 @@ end
 % alt_hold
 %   - regulate altitude using throttle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function u = PIR_alt_hold(h_c, h_hat, not_used, init_flag, P)
+function u = PIR_alt_hold(h_c, h_hat, Vn_hat, init_flag, P)
 
     % Set up PI with rate feedback
     y_c = h_c; % Command
     y = h_hat; % Feedback
-    y_dot = 0; % Rate feedback
-    kp = 5;
-    ki = 0.05;
-    kd = 5;
+    y_dot = Vn_hat; % Rate feedback
+    kp = 1;
+    ki = 0.0001;
+    kd = 20;
     u_lower_limit = 0.1;
     u_upper_limit = 0.9;
 
@@ -235,8 +239,13 @@ function u = PIR_alt_hold(h_c, h_hat, not_used, init_flag, P)
 
     % Perform "PI with rate feedback"
     error = y_c - y;  % Error between command and response
+    if error > 10
+        error = 10;
+    elseif error < -10
+        error = -10;
+    end
     error_int = error_int + P.Ts*error; % Update integrator
-    u = kp*error + ki*error_int - kd*y_dot;
+    u = kp*error + ki*error_int - kd*y_dot + 0.5;
 
     % Output saturation & integrator clamping
     %   - Limit u to u_upper_limit & u_lower_limit
@@ -264,10 +273,10 @@ function u = PIR_pitch_hold(theta_c, theta_hat, q_hat, init_flag, P)
     % Set up PI with rate feedback
     y_c = theta_c; % Command
     y = theta_hat; % Feedback
-    y_dot = q_hat; % Rate feedback
-    kp = 5;
-    ki = 0.05;
-    kd = 5;
+    y_dot = q_hat; % Rate feedback, 
+    kp = 0.1146;
+    ki = 0.0075;
+    kd = 0.025;
     u_lower_limit = -0.1;
     u_upper_limit = 0.1;
 
@@ -309,9 +318,9 @@ function u = PIR_yaw_hold(psi_c, psi_hat, r_hat, init_flag, P)
     y_c = psi_c; % Command
     y = psi_hat; % Feedback
     y_dot = r_hat; % Rate feedback
-    kp = 5;
-    ki = 0.05;
-    kd = 5;
+    kp = 0.1146;
+    ki = 0.001;
+    kd = 0.075;
     u_lower_limit = -0.1;
     u_upper_limit = 0.1;
 
@@ -354,9 +363,9 @@ function u = PIR_vhorz_hold_x(Vhx_c, Vhx_hat, not_used, init_flag, P)
     y_c = Vhx_c; % Command
     y = Vhx_hat; % Feedback
     y_dot = 0; % Rate feedback
-    kp = -1;
-    ki = -0.5;
-    kd = -0.1;
+    kp = -0.0349;
+    ki = -0.00001;
+    kd = -0.0001;
     u_lower_limit = -P.theta_max;
     u_upper_limit = +P.theta_max;
     % u_lower_limit = -0.1;
@@ -400,9 +409,9 @@ function u = PIR_vhorz_hold_y(Vhy_c, Vhy_hat, not_used, init_flag, P)
     y_c = Vhy_c; % Command
     y = Vhy_hat; % Feedback
     y_dot = 0; % Rate feedback
-    kp = 1;
-    ki = 0.5;
-    kd = 0.1;
+    kp = 0.0349;
+    ki = 0.00001;
+    kd = 0.0001;
     u_lower_limit = -P.phi_max;
     u_upper_limit = +P.phi_max;
     % u_lower_limit = -0.1;

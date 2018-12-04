@@ -13,7 +13,7 @@ dx = P.L_to_motor*sin(pi/4);
 
 G_de2pitch = (8*dx*k_Fp*P.k_omega^2*P.delta_t0)/(P.Jy*s^2);
 G_da2roll = (8*dy*k_Fp*P.k_omega^2*P.delta_t0)/(P.Jx*s^2);
-G_dr2yaw = (8*P.k_Tp*P.k_omega*P.delta_t0)/(P.Jz*s^2);
+G_dr2yaw = (8*P.k_Tp*P.k_omega^2*P.delta_t0)/(P.Jz*s^2);
 G_pitch2Vhx = -P.gravity/(s+(P.mu_rotorDrag/P.mass));
 G_roll2Vhx = +P.gravity/(s+(P.mu_rotorDrag/P.mass));
 
@@ -51,8 +51,8 @@ H(kpsi,kdr);
 % xlabel('Time', 'FontSize', 14);
 % ylabel('Amplitude', 'FontSize', 14);
 
-% Gcl_roll_low =PI_rateFeedback_TF(G_da2roll, 5, 0.05, 5); 
-% Gcl_roll_high=PI_rateFeedback_TF(H(kphi,kda), 5, 0.05, 5); 
+% Gcl_roll_low =PI_rateFeedback_TF(G_da2roll, 0.1146, 0.0075, 0.025); 
+% Gcl_roll_high=PI_rateFeedback_TF(H(kphi,kda), 0.1146, 0.075, 0.025); 
 % step(Gcl_roll_low, Gcl_roll_high, 10) % 2 seconds
 % grid on;
 % lgd = legend('G_da2roll', 'H(kphi,kda)');
@@ -62,8 +62,8 @@ H(kpsi,kdr);
 % xlabel('Time', 'FontSize', 14);
 % ylabel('Amplitude', 'FontSize', 14);
 
-% Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 20, 0.1, 30); 
-% Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 20, 0.1, 30); 
+% Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 0.05, 0.0001, 0.05); 
+% Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 0.05, 0.0001, 0.05); 
 % step(Gcl_alt_low, Gcl_alt_high, 10) % 2 seconds
 % grid on;
 % lgd = legend('G_dt2h', '-H(kpd,kdt))');
@@ -73,19 +73,19 @@ H(kpsi,kdr);
 % xlabel('Time', 'FontSize', 14);
 % ylabel('Amplitude', 'FontSize', 14);
 
-% Gcl_alt_low =PI_rateFeedback_TF(G_dt2h, 5, 0.05, 5); 
-% Gcl_alt_high=PI_rateFeedback_TF(-H(kpd,kdt), 5, 0.05, 5); 
-% step(Gcl_alt_low, Gcl_alt_high, 10) % 2 seconds
+% Gcl_yaw_low =PI_rateFeedback_TF(G_dr2yaw, 0.1146, 0.001, 0.075); 
+% Gcl_yaw_high=PI_rateFeedback_TF(H(kpsi,kdr), 0.1146, 0.001, 0.075); 
+% step(Gcl_yaw_low, Gcl_yaw_high, 10) % 2 seconds
 % grid on;
-% lgd = legend('G_dt2h', '-H(kpd,kdt))');
+% lgd = legend('G_dr2yaw', 'H(kpsi,kdr)');
 % lgd.FontSize = 12;
-% set(lgd,'string',{'G_dt2h','-H(kpd,kdt)'});
+% set(lgd,'string',{'G_dr2yaw','H(kpsi,kdr)'});
 % title('Step Response', 'FontSize', 14);
 % xlabel('Time', 'FontSize', 14);
 % ylabel('Amplitude', 'FontSize', 14);
 
-Gcl_pitch2Vhx =PI_rateFeedback_TF(G_pitch2Vhx, -1, -0.5, -0.1);
-Gcl_roll2Vhx =PI_rateFeedback_TF(G_roll2Vhx, 1, 0.5, 0.1);
+Gcl_pitch2Vhx =PI_rateFeedback_TF(G_pitch2Vhx, -0.0349, -0.00001, -0.0001);
+Gcl_roll2Vhx =PI_rateFeedback_TF(G_roll2Vhx, 0.0349, 0.00001, 0.0001);
 % step(Gcl_pitch2Vhx, G_roll2Vhx, 10) % 2 seconds
 step(Gcl_pitch2Vhx, 10); % 2 seconds
 grid on;
