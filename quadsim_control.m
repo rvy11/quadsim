@@ -98,8 +98,6 @@ function out = quadsim_control(uu,P)
         PIR_pitch_hold(0,0,0,firstTime,P); 
         PIR_alt_hold(0,0,0,firstTime,P); 
         PIR_yaw_hold(0,0,0,firstTime,P);
-%         PIR_airspeed_hold_using_throttle(0,0,0,firstTime,P); 
-%         PIR_airspeed_hold_using_pitch(0,0,0,firstTime,P);
     end
     
 %     if time<10
@@ -225,9 +223,9 @@ function u = PIR_alt_hold(h_c, h_hat, Vn_hat, init_flag, P)
     y_c = h_c; % Command
     y = h_hat; % Feedback
     y_dot = Vn_hat; % Rate feedback
-    kp = 1;
-    ki = 0.0001;
-    kd = 20;
+    kp = 0.075;
+    ki = 0.00001;
+    kd = 0.05;
     u_lower_limit = 0.1;
     u_upper_limit = 0.9;
 
