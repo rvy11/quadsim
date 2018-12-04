@@ -107,7 +107,7 @@ function out = quadsim_control(uu,P)
     % Getting trajectory commands
     [WP_n, WP_e, h_c, psi_c] = get_quadsim_trajectory_commands(time);
     chi_c = atan2(WP_e-pe_hat, WP_n - pn_hat);
-    k_pos = 0.1;
+    k_pos = 0.25;
     Vhorz_c = k_pos*sqrt((WP_e-pe_hat)^2 + (WP_n - pn_hat)^2);
     if (Vhorz_c > 8)
         Vhorz_c = 8;
