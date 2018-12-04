@@ -72,6 +72,38 @@ function out = quadsim_control(uu,P)
     % Note: For logging purposes, use variables: 
     %         Vhorz_c,  chi_c, h_c, phi_c, theta_c, psi_c
 
+    if time<10
+%         h_c=50;
+%         phi_c = 0;
+%         theta_c = 0;
+%         psi_c = 0;
+%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
+    elseif time<20
+%         h_c=25;
+%         phi_c = 45*pi/180;
+%         theta_c = 30*pi/180;
+%         psi_c = 45*pi/180;
+%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
+    elseif time<30
+%         h_c=50;
+%         phi_c = -45*pi/180;
+%         theta_c = -30*pi/180;
+%         psi_c = -45*pi/180;
+%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
+    elseif time<40
+%         h_c=75;
+%         phi_c = 45*pi/180;
+%         theta_c = 30*pi/180;
+%         psi_c = 45*pi/180;
+%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
+    else
+%         h_c=50;
+%         phi_c = 0;
+%         theta_c = 0;
+%         psi_c = 0;
+%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
+    end
+    
     % Getting trajectory commands
     [WP_n, WP_e, h_c, psi_c] = get_quadsim_trajectory_commands(time);
     chi_c = atan2(WP_e-pe_hat, WP_n - pn_hat);
@@ -99,33 +131,6 @@ function out = quadsim_control(uu,P)
         PIR_alt_hold(0,0,0,firstTime,P); 
         PIR_yaw_hold(0,0,0,firstTime,P);
     end
-    
-%     if time<10
-%         % h_c=50;
-%         % phi_c = 0;
-% %         theta_c = 0;
-% %         psi_c = 0;
-%     elseif time<20
-%         % h_c=25;
-% %         phi_c = 45*pi/180;
-% %         theta_c = 45*pi/180;
-%         psi_c = 45*pi/180;
-%     elseif time<30
-%         % h_c=50;
-% %         phi_c = -45*pi/180;
-% %         theta_c = -45*pi/180;
-% %         psi_c = -45*pi/180;
-%     elseif time<40
-%         % h_c=75;
-% %         phi_c = 45*pi/180;
-% %         theta_c = 45*pi/180;
-% %         psi_c = 45*pi/180;
-%     else
-%         % h_c=50;
-% %         phi_c = 0;
-% %         theta_c = 0;
-% %         psi_c = 0;
-%     end
 
     theta_c = PIR_vhorz_hold_x(Vhx_c, Vhx_hat, 0, firstTime, P);
     phi_c = PIR_vhorz_hold_y(Vhy_c, Vhy_hat, 0, firstTime, P); 
@@ -223,9 +228,9 @@ function u = PIR_alt_hold(h_c, h_hat, Vn_hat, init_flag, P)
     y_c = h_c; % Command
     y = h_hat; % Feedback
     y_dot = Vn_hat; % Rate feedback
-    kp = 0.075;
-    ki = 0.00001;
-    kd = 0.05;
+    kp = 0.05;
+    ki = 0.0001;
+    kd = 0.075;
     u_lower_limit = 0.1;
     u_upper_limit = 0.9;
 
@@ -362,8 +367,8 @@ function u = PIR_vhorz_hold_x(Vhx_c, Vhx_hat, not_used, init_flag, P)
     y = Vhx_hat; % Feedback
     y_dot = 0; % Rate feedback
     kp = -0.0349;
-    ki = -0.00001;
-    kd = -0.0001;
+    ki = -0.02;
+    kd = -0.00001;
     u_lower_limit = -P.theta_max;
     u_upper_limit = +P.theta_max;
     % u_lower_limit = -0.1;
@@ -408,8 +413,8 @@ function u = PIR_vhorz_hold_y(Vhy_c, Vhy_hat, not_used, init_flag, P)
     y = Vhy_hat; % Feedback
     y_dot = 0; % Rate feedback
     kp = 0.0349;
-    ki = 0.00001;
-    kd = 0.0001;
+    ki = 0.02;
+    kd = 0.00001;
     u_lower_limit = -P.phi_max;
     u_upper_limit = +P.phi_max;
     % u_lower_limit = -0.1;
