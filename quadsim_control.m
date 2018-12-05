@@ -71,38 +71,6 @@ function out = quadsim_control(uu,P)
     %
     % Note: For logging purposes, use variables: 
     %         Vhorz_c,  chi_c, h_c, phi_c, theta_c, psi_c
-
-    if time<10
-%         h_c=50;
-%         phi_c = 0;
-%         theta_c = 0;
-%         psi_c = 0;
-%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
-    elseif time<20
-%         h_c=25;
-%         phi_c = 45*pi/180;
-%         theta_c = 30*pi/180;
-%         psi_c = 45*pi/180;
-%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
-    elseif time<30
-%         h_c=50;
-%         phi_c = -45*pi/180;
-%         theta_c = -30*pi/180;
-%         psi_c = -45*pi/180;
-%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
-    elseif time<40
-%         h_c=75;
-%         phi_c = 45*pi/180;
-%         theta_c = 30*pi/180;
-%         psi_c = 45*pi/180;
-%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
-    else
-%         h_c=50;
-%         phi_c = 0;
-%         theta_c = 0;
-%         psi_c = 0;
-%         WP_n = 40; WP_e = 60; psi_c = 60*pi/180;
-    end
     
     % Getting trajectory commands
     [WP_n, WP_e, h_c, psi_c] = get_quadsim_trajectory_commands(time);
